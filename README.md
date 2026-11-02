@@ -1,3 +1,18 @@
+# Reproduction: Polish plural forms in Filament translations
+
+Polish has **three** plural forms (`1` / `2-4, 22-24, ...` / everything else). Laravel's `MessageSelector` returns index 0, 1 or 2 for `pl` and **falls back to the first segment** when the index is missing. Several `pl` strings in Filament only have two segments (or `{1}|[2,*]` ranges), so e.g. a 10-minute MFA code is described as expiring "za minutę" (in one minute) and an export of 10 rows says "1 wiersz".
+
+```bash
+composer install
+cp .env.example .env && php artisan key:generate
+php artisan repro:pl-plurals                      # prints the affected strings for 1, 2, 4, 5, 10, 22
+php artisan test --filter=PolishPluralTranslations  # 10 failing assertions on stock Filament
+```
+
+Added files: `routes/console.php` (`repro:pl-plurals` command), `tests/Feature/PolishPluralTranslationsTest.php`.
+
+---
+
 # Filament issue reproduction template
 
 A minimal Laravel + Filament application for reproducing bugs you would like to file at [`filamentphp/filament`](https://github.com/filamentphp/filament/issues).
